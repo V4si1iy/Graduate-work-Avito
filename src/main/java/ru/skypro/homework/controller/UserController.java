@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.model.dto.NewPasswordDTO;
+import ru.skypro.homework.model.dto.UpdateUser;
 import ru.skypro.homework.model.dto.User;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -86,9 +87,8 @@ public class UserController {
             }
     )
     @PatchMapping("/me")
-    public User updateUser(@RequestBody User user) {
-        System.out.println("updated");
-        return new User();
+    public UpdateUser updateUser(@RequestBody UpdateUser updateUser) {
+        return new UpdateUser();
     }
     @Operation(
             tags = "Пользователи",
