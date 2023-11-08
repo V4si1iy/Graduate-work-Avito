@@ -2,7 +2,7 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import ru.skypro.homework.model.dto.Ad;
-import ru.skypro.homework.model.dto.AdModel;
+import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
 

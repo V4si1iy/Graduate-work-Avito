@@ -2,7 +2,7 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import ru.skypro.homework.model.dto.Comment;
-import ru.skypro.homework.model.dto.CommentModel;
+import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 
 import java.time.LocalDate;
