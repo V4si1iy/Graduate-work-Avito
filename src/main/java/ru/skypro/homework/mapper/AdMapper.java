@@ -1,6 +1,7 @@
 package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.skypro.homework.model.dto.Ad;
 import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
@@ -24,7 +25,6 @@ public interface AdMapper {
     }
     default AdModel CreateAdsToAdsModel(CreateOrUpdateAd createOrUpdateAd) {
         AdModel adModel = new AdModel();
-        adModel.setDescription(createOrUpdateAd.getDescription());
         adModel.setPrice(createOrUpdateAd.getPrice());
         adModel.setTitle(createOrUpdateAd.getTitle());
         return adModel;
@@ -34,7 +34,6 @@ public interface AdMapper {
         extendedAd.setPk(adModel.getId());
         extendedAd.setAuthorFirstName(adModel.getUser().getFirstName());
         extendedAd.setAuthorLastName(adModel.getUser().getLastName());
-        extendedAd.setDescription(adModel.getDescription());
         extendedAd.setEmail(adModel.getUser().getUsername());
         extendedAd.setImage(Optional.ofNullable(adModel.getImage())
                 .orElse(null));
@@ -44,7 +43,6 @@ public interface AdMapper {
         return extendedAd;
     }
     default AdModel CreateAdsToAdsModel(AdModel adModel, CreateOrUpdateAd createOrUpdateAd){
-        adModel.setDescription(isNull(createOrUpdateAd.getDescription()) ? adModel.getDescription() : createOrUpdateAd.getDescription());
         adModel.setPrice(isNull(createOrUpdateAd.getPrice()) ? adModel.getPrice() : createOrUpdateAd.getPrice());
         adModel.setTitle(isNull(createOrUpdateAd.getTitle()) ? adModel.getTitle() : createOrUpdateAd.getTitle());
         return adModel;

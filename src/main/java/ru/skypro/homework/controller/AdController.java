@@ -4,19 +4,28 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.mapper.AdMapper;
 import ru.skypro.homework.model.dto.Ad;
 import ru.skypro.homework.model.dto.Ads;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
+import ru.skypro.homework.service.AdService;
 
 @RestController
 @RequestMapping("/ads")
 @CrossOrigin(value = "http://localhost:3000")
+@AllArgsConstructor
 public class AdController {
+    AdService adService;
+    AdMapper adMapper;
 
-
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(
             tags = "Объявления",
             summary = "Получить все объявления",
@@ -33,8 +42,9 @@ public class AdController {
     )
     @GetMapping
     public Ads getAds(@RequestBody Ads ads) {
-        return new Ads();
+        return adService.getAllAds();
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Получить информацию об объявлении",
@@ -60,9 +70,18 @@ public class AdController {
             }
     )
     @GetMapping("/{id}")
-    public ExtendedAd getFullAd(@PathVariable("id") int id) {
-        return new ExtendedAd();
+    public ResponseEntity<ExtendedAd> getFullAd(@PathVariable("id") int id) throws EntityNotFoundException {
+        try {
+            ExtendedAd ad = adService.getAdById((long) id);
+            return ResponseEntity.ok(ad);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
+
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Удалить объявление",
@@ -90,9 +109,17 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    public void removeAd(@PathVariable("id") int id) {
-
+    public ResponseEntity removeAd(@PathVariable("id") int id) throws EntityNotFoundException {
+        try {
+            adService.deleteAd((long) id);
+            return ResponseEntity.ok().build();
+        }
+        catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Обновить информацию об объявлении",
@@ -123,9 +150,10 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}")
-    public CreateOrUpdateAd updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ads){
+    public CreateOrUpdateAd updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ads) {
         return new CreateOrUpdateAd();
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Добавить объявление",
@@ -146,9 +174,10 @@ public class AdController {
             }
     )
     @PostMapping()
-    public CreateOrUpdateAd createAd(@RequestBody CreateOrUpdateAd ads){
+    public CreateOrUpdateAd createAd(@RequestBody CreateOrUpdateAd ads) {
         return new CreateOrUpdateAd();
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Получить объявления авторизованного пользователя",
@@ -173,6 +202,7 @@ public class AdController {
     public Ads getAdsMe(@RequestBody Ads ads) {
         return new Ads();
     }
+
     @Operation(
             tags = "Объявления",
             summary = "Обновить картинку объявления",
@@ -203,7 +233,7 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}/image")
-    public Ad updateAdImage(@PathVariable("id") int id){
+    public Ad updateAdImage(@PathVariable("id") int id) {
         return new Ad();
     }
 
