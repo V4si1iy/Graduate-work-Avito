@@ -1,6 +1,7 @@
 package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
+import ru.skypro.homework.model.dto.Register;
 import ru.skypro.homework.model.dto.User;
 import ru.skypro.homework.model.entity.UserModel;
 
@@ -23,6 +24,15 @@ public interface UserMapper {
         userModel.setLastName(user.getLastName());
         userModel.setPhone(user.getPhone());
         userModel.setRole(user.getRole());
+        return userModel;
+    }
+    default UserModel mapRegisterToUserModel(Register register, UserModel userModel) {
+        userModel.setUsername(register.getUsername());
+        userModel.setPassword(register.getPassword());
+        userModel.setFirstName(register.getFirstName());
+        userModel.setLastName(register.getLastName());
+        userModel.setPhone(register.getPhone());
+        userModel.setRole(register.getRole());
         return userModel;
     }
 }

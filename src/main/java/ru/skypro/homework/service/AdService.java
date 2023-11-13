@@ -29,7 +29,7 @@ public class AdService {
         log.info("Executing the method to create a new Ad");
 
         // Преобразование DTO в сущность
-        AdModel adModel = adMapper.CreateAdsToAdsModel(ad);
+        AdModel adModel = adMapper.CreateAdsToAdsModel(createAd);
 
         // Проверка наличия объявления по уникальному идентификатору
         if (adModel.getId() != null && repository.existsById(adModel.getId())) {
@@ -85,7 +85,7 @@ public class AdService {
         existingAd.setTitle(updatedAd.getTitle());
         existingAd.setPrice(updatedAd.getPrice());
         existingAd.setDescription(updatedAd.getDescription());
-        AdModel adModel= adMapper.CreateAdsToAdsModel(existingAd);
+        AdModel adModel= adMapper.CreateAdsToAdsModel(updatedAd);
         // Сохранение обновленной сущности
         AdModel updatedAdModel = repository.save(adModel);
 
