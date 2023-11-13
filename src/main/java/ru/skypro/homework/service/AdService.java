@@ -11,7 +11,9 @@ import ru.skypro.homework.model.dto.Ads;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
 import ru.skypro.homework.model.entity.AdModel;
+import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.repository.UserRepository;
 
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AdService {
     private final AdRepository repository;
+    private final UserRepository userRepository;
     private final AdMapper adMapper;
 
     public Ad create(CreateOrUpdateAd createAd,String author ) throws EntityExistsException {
@@ -109,6 +112,17 @@ public class AdService {
         log.info("Fetching all Ads");
         Ads allAd = new Ads();
         // Получение списка всех объявлений
+        allAd.setCount(Integer.parseInt(String.valueOf(repository.count())));
+        allAd.setResults(repository.findAll().stream().map(adMapper::adModelToAdDto).collect(Collectors.toList()));
+        return allAd;
+    }
+
+    public Ads getAdsUser(String author)
+    {
+        log.info("Fetching user Ads");
+        Ads allAd = new Ads();
+        // Получение списка всех объявлений
+
         allAd.setCount(Integer.parseInt(String.valueOf(repository.count())));
         allAd.setResults(repository.findAll().stream().map(adMapper::adModelToAdDto).collect(Collectors.toList()));
         return allAd;

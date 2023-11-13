@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.AdMapper;
@@ -41,7 +43,7 @@ public class AdController {
             }
     )
     @GetMapping
-    public Ads getAds(@RequestBody Ads ads) {
+    public Ads getAds() {
         return adService.getAllAds();
     }
 
@@ -199,7 +201,7 @@ public class AdController {
     )
 
     @GetMapping("/me")
-    public Ads getAdsMe(@RequestBody Ads ads) {
+    public Ads getAdsMe(Authentication authentication) {
         return new Ads();
     }
 
