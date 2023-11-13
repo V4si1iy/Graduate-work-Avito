@@ -16,6 +16,7 @@ public class AdModel {
     private String image;
     private int price;
     private String title;
+    private String description;
 
 
     @ManyToOne

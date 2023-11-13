@@ -72,7 +72,7 @@ public class AdController {
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAd> getFullAd(@PathVariable("id") int id) throws EntityNotFoundException {
         try {
-            ExtendedAd ad = adService.getAdById((long) id);
+            ExtendedAd ad = adService.getExtendedAdById((long) id);
             return ResponseEntity.ok(ad);
         }
         catch (EntityNotFoundException e)
