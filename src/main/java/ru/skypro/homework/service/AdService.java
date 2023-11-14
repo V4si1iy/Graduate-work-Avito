@@ -23,13 +23,14 @@ import java.util.stream.Collectors;
 public class AdService {
     private final AdRepository repository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final AdMapper adMapper;
 
-    public Ad create(CreateOrUpdateAd createAd,String author ) throws EntityExistsException {
+    public Ad create(CreateOrUpdateAd createAd) throws EntityExistsException {
         log.info("Executing the method to create a new Ad");
 
         // Преобразование DTO в сущность
-        AdModel adModel = adMapper.CreateAdsToAdsModel(ad);
+        AdModel adModel = adMapper.CreateAdsToAdsModel(createAd);
 
         // Проверка наличия объявления по уникальному идентификатору
         if (adModel.getId() != null && repository.existsById(adModel.getId())) {
@@ -77,20 +78,19 @@ public class AdService {
         }
     }
 
-    public Ad updateAd(Long adId, CreateOrUpdateAd updatedAd) throws EntityNotFoundException {
+    public CreateOrUpdateAd updateAd(Long adId, CreateOrUpdateAd updatedAd) throws EntityNotFoundException {
         log.info("Updating Ad with id {}", adId);
 
         // Проверка существования объявления
         Ad existingAd = getAdById(adId);
-        existingAd.setTitle(updatedAd.getTitle());
-        existingAd.setPrice(updatedAd.getPrice());
-        existingAd.setDescription(updatedAd.getDescription());
-        AdModel adModel= adMapper.CreateAdsToAdsModel(existingAd);
+
+        // Преобразование DTO в сущность
+        AdModel adModel= adMapper.CreateAdsToAdsModel(updatedAd);
         // Сохранение обновленной сущности
         AdModel updatedAdModel = repository.save(adModel);
 
         log.info("Ad with id {} updated successfully", adId);
-        return adMapper.adModelToAdDto(updatedAdModel);
+        return updatedAd;
     }
 
     public void deleteAd(Long adId) throws EntityNotFoundException {
@@ -117,14 +117,13 @@ public class AdService {
         return allAd;
     }
 
-    public Ads getAdsUser(String author)
-    {
+    public Ads getAdsUser(String author) throws EntityNotFoundException {
         log.info("Fetching user Ads");
         Ads allAd = new Ads();
         // Получение списка всех объявлений
-
-        allAd.setCount(Integer.parseInt(String.valueOf(repository.count())));
-        allAd.setResults(repository.findAll().stream().map(adMapper::adModelToAdDto).collect(Collectors.toList()));
+        UserModel userModel= userService.getUserByUsername(author);
+        allAd.setCount(repository.countByUser(userModel));
+        allAd.setResults(repository.getAdModelByUser(userModel).stream().map(adMapper::adModelToAdDto).collect(Collectors.toList()));
         return allAd;
     }
 }

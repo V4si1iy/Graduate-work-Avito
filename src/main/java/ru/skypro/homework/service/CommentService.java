@@ -6,12 +6,17 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.model.dto.Ads;
 import ru.skypro.homework.model.dto.Comment;
 import ru.skypro.homework.model.dto.Comments;
+import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.entity.CommentModel;
+import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.CommentRepository;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 @Service
 @Slf4j
@@ -20,16 +25,16 @@ public class CommentService {
     private final CommentRepository repository;
     private final CommentMapper commentMapper;
 
-    public Comment create(Comment comment) throws EntityExistsException {
+    public Comment create(Long commentId , CreateOrUpdateComment comment) throws EntityExistsException {
         log.info("Executing the method to create a new Comment");
 
         // Преобразование DTO в сущность
-        CommentModel commentModel = commentMapper.mapCommentDtoToCommentModel(comment);
+        CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(comment);
 
         // Проверка наличия объявления по уникальному идентификатору
-        if (commentModel.getId() != null && repository.existsById(commentModel.getId())) {
-            log.error("Failed to create Comment. Comment with id {} already exists.", commentModel.getId());
-            throw new EntityExistsException("Comment with id " + commentModel.getId() + " already exists");
+        if (commentId != null && repository.existsById(commentId)) {
+            log.error("Failed to create Comment. Comment with id {} already exists.", commentId);
+            throw new EntityExistsException("Comment with id " + commentId + " already exists");
         }
 
         // Сохранение сущности
@@ -57,13 +62,13 @@ public class CommentService {
         }
     }
 
-    public Comment updateComment(Long commentId, Comment updatedComment) throws EntityNotFoundException {
+    public Comment updateComment(Long commentId, CreateOrUpdateComment updatedComment) throws EntityNotFoundException {
         log.info("Updating Comment with id {}", commentId);
 
         // Преобразование DTO в сущность
-        CommentModel commentModel = commentMapper.mapCommentDtoToCommentModel(updatedComment);
+        CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
         // Проверка существования объявления
-        Comment existingComment = getCommentById(commentModel.getId());
+        Comment existingComment = getCommentById(commentId);
 
         // Сохранение обновленной сущности
         CommentModel updatedCommentModel = repository.save(commentModel);
@@ -76,7 +81,7 @@ public class CommentService {
         log.info("Deleting Comment with id {}", commentId);
         try {
             CommentModel existingCommentModel = repository.findById(commentId)
-                    .orElseThrow(() -> new EntityNotFoundException("Ad with id " + commentId + " not found"));
+                    .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
 
             repository.delete(existingCommentModel);
 
@@ -87,12 +92,17 @@ public class CommentService {
         }
     }
 
-    public Comments getAllComments() {
-        log.info("Fetching all Comments");
+    public Comments getAdComments(Long adId) throws EntityNotFoundException {
+        log.info("Fetching ad Comments");
         Comments allComments = new Comments();
-        // Получение списка всех объявлений
-        allComments.setCount(Integer.parseInt(String.valueOf(repository.count())));
-        allComments.setResult(repository.findAll().stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));
+        // Получение списка всех комментариев
+
+        allComments.setCount(repository.countByAds_Id(adId));
+        List<CommentModel> commentModels = repository.getAllByAds_Id(adId);
+        if(Objects.isNull(commentModels))
+            throw new EntityNotFoundException("Comments don't found");
+
+        allComments.setResult(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));
         return allComments;
     }
 }

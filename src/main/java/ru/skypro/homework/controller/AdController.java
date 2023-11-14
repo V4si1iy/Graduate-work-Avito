@@ -11,13 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.AdMapper;
-import ru.skypro.homework.model.dto.Ad;
-import ru.skypro.homework.model.dto.Ads;
-import ru.skypro.homework.model.dto.CreateOrUpdateAd;
-import ru.skypro.homework.model.dto.ExtendedAd;
+import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.service.AdService;
+
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/ads")
@@ -72,7 +72,7 @@ public class AdController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ExtendedAd> getFullAd(@PathVariable("id") int id) throws EntityNotFoundException {
+    public ResponseEntity<ExtendedAd> getFullAd(@PathVariable("id") int id) {
         try {
             ExtendedAd ad = adService.getExtendedAdById((long) id);
             return ResponseEntity.ok(ad);
@@ -152,8 +152,16 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}")
-    public CreateOrUpdateAd updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ads) {
-        return new CreateOrUpdateAd();
+    public ResponseEntity<CreateOrUpdateAd> updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ad) {
+        try {
+            CreateOrUpdateAd newAd = adService.updateAd((long)id,ad);
+            return ResponseEntity.ok(newAd);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.notFound().build();
+
+        }
     }
 
     @Operation(
@@ -176,8 +184,16 @@ public class AdController {
             }
     )
     @PostMapping()
-    public CreateOrUpdateAd createAd(@RequestBody CreateOrUpdateAd ads) {
-        return new CreateOrUpdateAd();
+    public ResponseEntity<Ad> createAd(@RequestBody CreateOrUpdateAd ad) {
+        try {
+            Ad newAd = adService.create(ad);
+            return ResponseEntity.ok(newAd);
+        }
+        catch (EntityExistsException e)
+        {
+            return ResponseEntity.status(401).build();
+
+        }
     }
 
     @Operation(
@@ -201,8 +217,15 @@ public class AdController {
     )
 
     @GetMapping("/me")
-    public Ads getAdsMe(Authentication authentication) {
-        return new Ads();
+    public ResponseEntity<Ads> getAdsMe(Authentication authentication) {
+        try {
+            ;
+            return ResponseEntity.ok(adService.getAdsUser(authentication.getName()));
+        }
+        catch (EntityNotFoundException e)
+        {
+            return ResponseEntity.status(401).build();
+        }
     }
 
     @Operation(

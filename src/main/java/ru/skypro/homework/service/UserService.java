@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
-import ru.skypro.homework.model.dto.UpdateUser;
 import ru.skypro.homework.model.dto.User;
 import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.UserRepository;
 
-import java.util.stream.Collectors;
+import java.util.Objects;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -52,6 +52,22 @@ public class UserService {
             return mapper.mapToUserDto(userModel);
         } catch (Exception e) {
             log.error("Error fetching User with id {}", uesrId, e);
+            throw e;
+        }
+    }
+
+    protected UserModel getUserByUsername(String username) throws EntityNotFoundException {
+        log.info("Fetching User with username {}", username);
+
+        try {
+            UserModel userModel = repository.getUserModelByUsername(username);
+            if (Objects.isNull(userModel))
+                throw new EntityNotFoundException("User with username " + username + " not found");
+
+            log.info("Fetched User: {}", userModel);
+            return userModel;
+        } catch (Exception e) {
+            log.error("Error fetching User with username {}", username, e);
             throw e;
         }
     }
