@@ -33,6 +33,10 @@ public interface CommentMapper {
         }
         return commentModel;
     }
-    CommentModel createOrUpdateCommentToCommentModel(CreateOrUpdateComment createOrUpdateComment);
+    default CommentModel createOrUpdateCommentToCommentModel(CreateOrUpdateComment createOrUpdateComment){
+        CommentModel commentModel = new CommentModel();
+        commentModel.setText(createOrUpdateComment.getText());
+        return commentModel;
+    }
 
 }
