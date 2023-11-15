@@ -14,10 +14,7 @@ public class UserModel {
 
     @Id
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    private UserDetails username;
+    private String username;
     private String firstName;
     private String lastName;
     private String phone;

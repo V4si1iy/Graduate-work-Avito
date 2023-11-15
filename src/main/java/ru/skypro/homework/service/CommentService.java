@@ -15,27 +15,30 @@ import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.CommentRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 @AllArgsConstructor
 public class CommentService {
     private final CommentRepository repository;
     private final CommentMapper commentMapper;
+    private final AdService adService;
+    private final UserService userService;
 
-    public Comment create(Long commentId , CreateOrUpdateComment comment) throws EntityExistsException {
+    public Comment create(Long adId, CreateOrUpdateComment comment,String author) throws EntityExistsException, EntityNotFoundException {
         log.info("Executing the method to create a new Comment");
 
         // Преобразование DTO в сущность
         CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(comment);
-
-        // Проверка наличия объявления по уникальному идентификатору
-        if (commentId != null && repository.existsById(commentId)) {
-            log.error("Failed to create Comment. Comment with id {} already exists.", commentId);
-            throw new EntityExistsException("Comment with id " + commentId + " already exists");
-        }
+        AdModel adModel = adService.getAdById(adId);
+        UserModel userModel = userService.getUserByUsername(author);
+        commentModel.setUser(userModel);
+        commentModel.setAds(adModel);
+        commentModel.setCreatedAt(LocalDate.now());
 
         // Сохранение сущности
         CommentModel savedCommentModel = repository.save(commentModel);
@@ -47,7 +50,7 @@ public class CommentService {
         return savedComment;
     }
 
-    public Comment getCommentById(Long commentId) throws EntityNotFoundException {
+    protected CommentModel getCommentById(Long commentId) throws EntityNotFoundException {
         log.info("Fetching Comment with id {}", commentId);
 
         try {
@@ -55,7 +58,7 @@ public class CommentService {
                     .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
 
             log.info("Fetched Comment: {}", commentModel);
-            return commentMapper.mapCommentModelToCommentDto(commentModel);
+            return commentModel;
         } catch (Exception e) {
             log.error("Error fetching Comment with id {}", commentId, e);
             throw e;
@@ -67,8 +70,12 @@ public class CommentService {
 
         // Преобразование DTO в сущность
         CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
+
         // Проверка существования объявления
-        Comment existingComment = getCommentById(commentId);
+        CommentModel existingComment = getCommentById(commentId);
+        commentModel.setUser(existingComment.getUser());
+        commentModel.setAds(existingComment.getAds());
+        commentModel.setCreatedAt(LocalDate.now());
 
         // Сохранение обновленной сущности
         CommentModel updatedCommentModel = repository.save(commentModel);
@@ -95,11 +102,11 @@ public class CommentService {
     public Comments getAdComments(Long adId) throws EntityNotFoundException {
         log.info("Fetching ad Comments");
         Comments allComments = new Comments();
-        // Получение списка всех комментариев
 
+        // Получение списка всех комментариев
         allComments.setCount(repository.countByAds_Id(adId));
         List<CommentModel> commentModels = repository.getAllByAds_Id(adId);
-        if(Objects.isNull(commentModels))
+        if (Objects.isNull(commentModels))
             throw new EntityNotFoundException("Comments don't found");
 
         allComments.setResult(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));

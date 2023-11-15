@@ -4,20 +4,30 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.model.dto.ExtendedAd;
 import ru.skypro.homework.model.dto.NewPasswordDTO;
 import ru.skypro.homework.model.dto.UpdateUser;
 import ru.skypro.homework.model.dto.User;
+import ru.skypro.homework.service.UserService;
+
+import java.io.IOException;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-
+    private final UserService userService;
 
     @Operation(
             tags = "Пользователи",
@@ -39,9 +49,15 @@ public class UserController {
             }
     )
     @GetMapping("/me")
-    public User getUser(@RequestBody User user){
-        return new User();
+    public ResponseEntity<User> getUser(Authentication authentication) {
+        try {
+            User user = userService.getUserByUsernameDto(authentication.getName());
+            return ResponseEntity.ok(user);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
+
     @Operation(
             tags = "Пользователи",
             summary = "Обновление пароля",
@@ -64,9 +80,15 @@ public class UserController {
             }
     )
     @PostMapping("/set_password")
-    public NewPasswordDTO setUserPassword(@RequestBody NewPasswordDTO newPasswordDTO) {
-        return new NewPasswordDTO();
+    public ResponseEntity setUserPassword(@RequestBody NewPasswordDTO newPasswordDTO, Authentication authentication) {
+        try {
+            userService.setNewPassword(newPasswordDTO, authentication.getName());
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
+
     @Operation(
             tags = "Пользователи",
             summary = "Обновить информацию об авторизованном пользователе",
@@ -87,9 +109,15 @@ public class UserController {
             }
     )
     @PatchMapping("/me")
-    public UpdateUser updateUser(@RequestBody UpdateUser updateUser) {
-        return new UpdateUser();
+    public ResponseEntity<UpdateUser> updateUser(@RequestBody UpdateUser updateUser, Authentication authentication) {
+        try {
+
+            return ResponseEntity.ok(userService.updateUser(updateUser, authentication.getName()));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
+
     @Operation(
             tags = "Пользователи",
             summary = "Обновить аватар авторизованного пользователя",
@@ -106,9 +134,15 @@ public class UserController {
                     )
             }
     )
-    @PatchMapping("/me/image")
-    public User updateUserImage(@RequestBody User user) {
-        System.out.println("image updated");
-        return new User();
+    @PatchMapping(name ="/me/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity updateUserImage(@RequestParam MultipartFile userFile, Authentication authentication) throws IOException {
+        try {
+userService.updateUserImage(userFile,authentication.getName());
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (IOException e) {
+            throw e;
+        }
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
@@ -85,15 +86,17 @@ public class CommentController {
             }
     )
     @PostMapping(value = "{id}/comments")
-    public ResponseEntity<Comment> addComment(@PathVariable("id") int commentId, @RequestBody CreateOrUpdateComment comment){
+    public ResponseEntity<Comment> addComment(@PathVariable("id") int adId, @RequestBody CreateOrUpdateComment comment , Authentication authentication){
         try {
-            Comment newComment = commentService.create((long)commentId,comment);
+            Comment newComment = commentService.create((long)adId,comment,authentication.getName());
             return ResponseEntity.ok(newComment);
         }
         catch (EntityExistsException e)
         {
             return ResponseEntity.status(401).build();
 
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
     @Operation(

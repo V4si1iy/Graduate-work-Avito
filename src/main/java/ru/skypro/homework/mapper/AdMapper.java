@@ -27,6 +27,7 @@ public interface AdMapper {
         AdModel adModel = new AdModel();
         adModel.setPrice(createOrUpdateAd.getPrice());
         adModel.setTitle(createOrUpdateAd.getTitle());
+        adModel.setDescription(createOrUpdateAd.getDescription());
         return adModel;
     }
     default ExtendedAd adsModelToExtendedAdds(AdModel adModel) {
