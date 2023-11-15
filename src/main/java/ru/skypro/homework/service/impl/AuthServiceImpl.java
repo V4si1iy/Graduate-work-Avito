@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.model.dto.Login;
 import ru.skypro.homework.model.dto.Register;
+import ru.skypro.homework.model.dto.Role;
 import ru.skypro.homework.service.AuthService;
 import ru.skypro.homework.service.UserService;
 
@@ -31,24 +32,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean register(Register register) {
+    public boolean register(Register register, Role role) {
         if (manager.userExists(register.getUsername())) {
             return false;
         }
-        ru.skypro.homework.model.dto.User user = new ru.skypro.homework.model.dto.User();
-        user.setRole(register.getRole());
-        user.setEmail(register.getUsername());
-        user.setPhone(register.getPhone());
-        user.setFirstName(register.getFirstName());
-        user.setLastName(register.getLastName());
-        userService.create(user);
-        manager.createUser(
-                User.builder()
-                        .passwordEncoder(this.encoder::encode)
-                        .password(register.getPassword())
-                        .username(register.getUsername())
-                        .roles(register.getRole().name())
-                        .build());
+        userService.create(register, role);
         return true;
     }
 

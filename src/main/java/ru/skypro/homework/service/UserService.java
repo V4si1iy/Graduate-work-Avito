@@ -33,21 +33,11 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final ImageRepository imageRepository;
 
-    public User create(User user) {
-        log.info("Executing the method to create a new User");
-
-        // Преобразование DTO в сущность
-        UserModel userModel = mapper.mapUserDtoToUserModel(user);
-
-
-        // Сохранение сущности
-        UserModel savedUserModel = repository.save(userModel);
-
-        // Преобразование сохраненной сущности обратно в DTO и возврат
-        User savedComment = mapper.mapToUserDto(savedUserModel);
-
-        log.info("User with id {} created successfully", savedComment.getId());
-        return savedComment;
+    public void create(Register register, Role role) {
+        UserModel userModel = mapper.mapRegisterToUserModel(register, new UserModel());
+        userModel.setPassword(encoder.encode(register.getPassword()));
+        userModel.setRole(Objects.requireNonNullElse(role, Role.USER));
+        repository.save(userModel);
     }
 
     public User getUserByUsernameDto(String username) throws EntityNotFoundException {
