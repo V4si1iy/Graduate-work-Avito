@@ -2,16 +2,26 @@ package ru.skypro.homework.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
-import ru.skypro.homework.model.dto.UpdateUser;
-import ru.skypro.homework.model.dto.User;
+import ru.skypro.homework.model.dto.*;
+import ru.skypro.homework.model.entity.CommentModel;
+import ru.skypro.homework.model.entity.Image;
 import ru.skypro.homework.model.entity.UserModel;
+import ru.skypro.homework.repository.ImageRepository;
 import ru.skypro.homework.repository.UserRepository;
 
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.UUID;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -19,17 +29,16 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
 
-    public User create(User user) throws EntityExistsException {
+    private final UserDetailsManager manager;
+    private final PasswordEncoder encoder;
+    private final ImageRepository imageRepository;
+
+    public User create(User user) {
         log.info("Executing the method to create a new User");
 
         // Преобразование DTO в сущность
         UserModel userModel = mapper.mapUserDtoToUserModel(user);
 
-        // Проверка наличия объявления по уникальному идентификатору
-        if (userModel.getId() != null && repository.existsById(userModel.getId())) {
-            log.error("Failed to create User. User with id {} already exists.", userModel.getId());
-            throw new EntityExistsException("User with id " + userModel.getId() + " already exists");
-        }
 
         // Сохранение сущности
         UserModel savedUserModel = repository.save(userModel);
@@ -41,34 +50,65 @@ public class UserService {
         return savedComment;
     }
 
-    public User getUserById(Long uesrId) throws EntityNotFoundException {
-        log.info("Fetching User with id {}", uesrId);
+    public User getUserByUsernameDto(String username) throws EntityNotFoundException {
+        return mapper.mapToUserDto(getUserByUsername(username));
+    }
+
+    protected UserModel getUserByUsername(String username) throws EntityNotFoundException {
+        log.info("Fetching User with username {}", username);
 
         try {
-            UserModel userModel = repository.findById(uesrId)
-                    .orElseThrow(() -> new EntityNotFoundException("User with id " + uesrId + " not found"));
+            UserModel userModel = repository.getUserModelByUsername(username);
+            if (Objects.isNull(userModel))
+                throw new EntityNotFoundException("User with username " + username + " not found");
 
             log.info("Fetched User: {}", userModel);
-            return mapper.mapToUserDto(userModel);
+            return userModel;
         } catch (Exception e) {
-            log.error("Error fetching User with id {}", uesrId, e);
+            log.error("Error fetching User with username {}", username, e);
             throw e;
         }
     }
 
-    public void deleteUser(Long userId) throws EntityNotFoundException {
-        log.info("Deleting Comment with id {}", userId);
-        try {
-            UserModel existingCommentModel = repository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("Ad with id " + userId + " not found"));
-
-            repository.delete(existingCommentModel);
-
-            log.info("Comment with id {} deleted successfully", userId);
-        } catch (Exception e) {
-            log.error("Error deleting Comment with id {}", userId, e);
-            throw e;
-        }
+    public void setNewPassword(NewPasswordDTO newPassword, String user) throws EntityNotFoundException {
+        UserDetails userDetails = manager.loadUserByUsername(user);
+        if (encoder.matches(newPassword.getCurrentPassword(), userDetails.getPassword()))
+            manager.updateUser(
+                    org.springframework.security.core.userdetails.User.builder()
+                            .passwordEncoder(this.encoder::encode)
+                            .password(newPassword.getNewPassword())
+                            .username(userDetails.getUsername())
+                            .build());
     }
+
+    public UpdateUser updateUser(UpdateUser user, String username) throws EntityNotFoundException {
+        log.info("Updating User with username {}", username);
+
+        // Проверка существования пользователя
+        UserModel userModel = getUserByUsername(username);
+
+        userModel.setFirstName(user.getFirstName());
+        userModel.setLastName(user.getLastName());
+        userModel.setPhone(user.getPhone());
+
+        // Сохранение обновленной сущности
+        UserModel updatedUserModel = repository.save(userModel);
+
+        log.info("User with username {} updated successfully", username);
+        return user;
+    }
+
+    public void updateUserImage(MultipartFile file , String username) throws EntityNotFoundException, IOException {
+        // Проверка существования пользователя
+        UserModel userModel = getUserByUsername(username);
+        // Сохранения фотографии в бд
+        Image image = imageRepository.getImageByLink(userModel.getImage());
+        image.setFileSize(file.getSize());
+        image.setData(file.getBytes());
+        image.setMediaType(file.getContentType());
+        imageRepository.save(image);
+
+    }
+
 
 }

@@ -1,16 +1,17 @@
 package ru.skypro.homework.model.entity;
 
 import lombok.Data;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.skypro.homework.model.dto.Role;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "mp_users")
+@Table(name = "users_details")
 @Data
 public class UserModel {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
     private String username;

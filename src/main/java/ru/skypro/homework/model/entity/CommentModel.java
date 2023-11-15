@@ -1,8 +1,6 @@
 package ru.skypro.homework.model.entity;
 
 import lombok.Data;
-import ru.skypro.homework.model.entity.AdModel;
-import ru.skypro.homework.model.entity.UserModel;
 
 import javax.persistence.*;
 import java.time.LocalDate;
