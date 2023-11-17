@@ -16,7 +16,6 @@ import ru.skypro.homework.model.entity.Image;
 import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.ImageRepository;
-import ru.skypro.homework.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.UUID;

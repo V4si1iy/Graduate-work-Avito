@@ -1,14 +1,17 @@
 package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.skypro.homework.model.dto.Comment;
-import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
+import ru.skypro.homework.model.entity.CommentModel;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-@Mapper
+@Mapper(componentModel = "spring")
+@Component
 public interface CommentMapper {
 
     default Comment mapCommentModelToCommentDto(CommentModel commentModel) {
