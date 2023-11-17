@@ -1,13 +1,10 @@
 package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import ru.skypro.homework.model.dto.Ad;
-import ru.skypro.homework.model.dto.User;
-import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
-import ru.skypro.homework.model.entity.UserModel;
+import ru.skypro.homework.model.entity.AdModel;
 
 import java.util.Optional;
 

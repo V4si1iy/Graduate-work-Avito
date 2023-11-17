@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.service.AdService;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/ads")

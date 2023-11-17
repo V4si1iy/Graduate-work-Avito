@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.CommentMapper;
-import ru.skypro.homework.model.dto.Ads;
 import ru.skypro.homework.model.dto.Comment;
 import ru.skypro.homework.model.dto.Comments;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
