@@ -8,6 +8,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.skypro.homework.model.dto.Register;
 import ru.skypro.homework.model.dto.User;
 import ru.skypro.homework.model.entity.UserModel;

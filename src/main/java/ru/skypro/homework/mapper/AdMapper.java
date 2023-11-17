@@ -1,6 +1,8 @@
 package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.skypro.homework.model.dto.Ad;
 import ru.skypro.homework.model.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.dto.ExtendedAd;
@@ -10,7 +12,8 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
-@Mapper
+@Mapper(componentModel = "spring")
+@Component
 public interface AdMapper {
     default Ad adModelToAdDto(AdModel adModel){
         Ad ad = new Ad();
