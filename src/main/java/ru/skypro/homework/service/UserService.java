@@ -7,41 +7,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.dto.*;
-import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.entity.Image;
 import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.ImageRepository;
 import ru.skypro.homework.repository.UserRepository;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class UserService {
     private final UserRepository repository;
-    private final UserMapper mapper;
 
+    private final UserMapper userMapper;
     private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
     private final ImageRepository imageRepository;
 
     public void create(Register register, Role role) {
-        UserModel userModel = mapper.mapRegisterToUserModel(register, new UserModel());
+        UserModel userModel = userMapper.mapRegisterToUserModel(register, new UserModel());
         userModel.setPassword(encoder.encode(register.getPassword()));
         userModel.setRole(Objects.requireNonNullElse(role, Role.USER));
         repository.save(userModel);
     }
 
     public User getUserByUsernameDto(String username) throws EntityNotFoundException {
-        return mapper.mapToUserDto(getUserByUsername(username));
+        return userMapper.mapToUserDto(getUserByUsername(username));
     }
 
     protected UserModel getUserByUsername(String username) throws EntityNotFoundException {

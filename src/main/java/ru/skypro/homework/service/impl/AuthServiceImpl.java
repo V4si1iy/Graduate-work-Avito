@@ -37,6 +37,13 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         userService.create(register, role);
+        manager.createUser(
+                User.builder()
+                        .passwordEncoder(this.encoder::encode)
+                        .password(register.getPassword())
+                        .username(register.getUsername())
+                        .roles(register.getRole().name())
+                        .build());
         return true;
     }
 
