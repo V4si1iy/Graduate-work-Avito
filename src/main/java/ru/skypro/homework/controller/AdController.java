@@ -178,8 +178,9 @@ public class AdController {
                     )
             }
     )
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Ad> createAd(@RequestBody CreateOrUpdateAd ad, @RequestParam MultipartFile adFile, Authentication authentication) throws IOException {
+    public ResponseEntity<Ad> createAd(@RequestParam MultipartFile adFile, @RequestBody CreateOrUpdateAd ad, Authentication authentication) throws IOException {
         try {
             Ad newAd = adService.create(ad, adFile, authentication.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(newAd);

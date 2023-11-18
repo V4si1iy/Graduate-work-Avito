@@ -57,6 +57,7 @@ public class UserService {
     }
 
     public void setNewPassword(NewPasswordDTO newPassword, String user) throws EntityNotFoundException {
+        UserModel userModel = getUserByUsername(user);
         UserDetails userDetails = manager.loadUserByUsername(user);
         if (encoder.matches(newPassword.getCurrentPassword(), userDetails.getPassword()))
             manager.updateUser(
@@ -64,6 +65,7 @@ public class UserService {
                             .passwordEncoder(this.encoder::encode)
                             .password(newPassword.getNewPassword())
                             .username(userDetails.getUsername())
+                            .roles(userModel.getRole().toString())
                             .build());
     }
 
