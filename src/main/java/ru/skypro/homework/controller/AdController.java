@@ -16,7 +16,9 @@ import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.AdMapper;
 import ru.skypro.homework.model.dto.*;
+import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.service.AdService;
+import ru.skypro.homework.service.UserService;
 
 import java.io.IOException;
 
@@ -27,6 +29,7 @@ import java.io.IOException;
 public class AdController {
     AdService adService;
     AdMapper adMapper;
+    UserService userService;
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(
@@ -110,11 +113,13 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity removeAd(@PathVariable("id") int id) throws EntityNotFoundException {
-        try {
+    public ResponseEntity removeAd(@PathVariable("id") int id, Authentication authentication) throws EntityNotFoundException {
+        ResponseEntity<?> response = accessResponse(authentication, (long)id);
+
+        if (!response.getStatusCode().equals(HttpStatus.OK)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } else {
             adService.deleteAd((long) id);
-            return ResponseEntity.ok().build();
-        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
     }
@@ -149,13 +154,14 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<CreateOrUpdateAd> updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ad) {
-        try {
-            CreateOrUpdateAd newAd = adService.updateAd((long) id, ad);
-            return ResponseEntity.ok(newAd);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<CreateOrUpdateAd> updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd createOrUpdateAd,Authentication authentication) throws EntityNotFoundException {
+        ResponseEntity<?> response = accessResponse(authentication, (long)id);
 
+        if (!response.getStatusCode().equals(HttpStatus.OK)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } else {
+            CreateOrUpdateAd cr = adService.updateAd((long)id, createOrUpdateAd);
+            return ResponseEntity.ok(cr);
         }
     }
 
@@ -263,5 +269,17 @@ public class AdController {
             throw e;
         }
 
+    }
+    private ResponseEntity<?> accessResponse(Authentication authentication, Long id) throws EntityNotFoundException {
+        AdModel adModel = adService.getAdById(id);
+
+        if (adModel == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else if (adModel.getUser().getUsername().equals(authentication.getName()) ||
+                userService.getUser(authentication.getName()).getRole() == Role.ADMIN) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }

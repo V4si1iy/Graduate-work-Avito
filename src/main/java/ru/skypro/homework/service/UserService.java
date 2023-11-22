@@ -39,6 +39,9 @@ public class UserService {
     public User getUserByUsernameDto(String username) throws EntityNotFoundException {
         return userMapper.mapToUserDto(getUserByUsername(username));
     }
+    public UserModel getUser(String username) {
+        return repository.findUserByUsername(username).orElseThrow();
+    }
 
     protected UserModel getUserByUsername(String username) throws EntityNotFoundException {
         log.info("Fetching User with username {}", username);

@@ -12,4 +12,5 @@ public interface UserRepository extends JpaRepository<UserModel,Long> {
 
   public UserModel getUserModelByUsername(String username);
   UserModel findByUsername(String login);
+  Optional<UserModel> findUserByUsername(String username);
 }
