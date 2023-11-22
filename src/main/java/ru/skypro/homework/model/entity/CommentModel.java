@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mp_comments")
@@ -19,6 +20,6 @@ public class CommentModel {
     @ManyToOne
     @JoinColumn(name = "ads_id")
     private AdModel ads;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private String text;
 }

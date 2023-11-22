@@ -20,9 +20,9 @@ public class ImageController {
     private final ImageRepository imageRepository;
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getImageFromDB(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getImageFromDB(@PathVariable("id") String id) {
         HttpHeaders headers = new HttpHeaders();
-        Image image = imageRepository.getImageById(id);
+        Image image = imageRepository.getImageByLink("/image/"+id);
         headers.setContentType(MediaType.parseMediaType(image.getMediaType()));
         headers.setContentLength(image.getData().length);
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(image.getData());

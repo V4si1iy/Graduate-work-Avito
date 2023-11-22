@@ -8,6 +8,7 @@ import ru.skypro.homework.model.dto.CreateOrUpdateComment;
 import ru.skypro.homework.model.entity.CommentModel;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
@@ -19,7 +20,7 @@ public interface CommentMapper {
         comment.setAuthor(commentModel.getUser().getId());
         comment.setAuthorImage(String.valueOf(Optional.ofNullable(commentModel.getUser())
                 .orElse(null)));
-        comment.setCreatedAt(LocalDate.parse(commentModel.getCreatedAt().toString()));
+        comment.setCreatedAt(LocalDateTime.parse(commentModel.getCreatedAt().toString()));
         comment.setText(commentModel.getText());
         return comment;
     }

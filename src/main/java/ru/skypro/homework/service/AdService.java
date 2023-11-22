@@ -49,8 +49,8 @@ public class AdService {
         image.setFileSize(adFile.getSize());
         image.setData(adFile.getBytes());
         image.setMediaType(adFile.getContentType());
-        adModel.setImage("http://localhost:8080/image/{" + image.getId() + "}");
-        image.setLink("http://localhost:8080/image/{" + image.getId() + "}");
+        adModel.setImage("/image/{" + image.getId() + "}");
+        image.setLink("/image/{" + image.getId() + "}");
         imageRepository.save(image);
 
         // Сохранение сущности
@@ -148,7 +148,7 @@ public class AdService {
         return allAd;
     }
 
-    public void updateImageAd(MultipartFile file , Long id) throws EntityNotFoundException , IOException {
+    public void updateImageAd(MultipartFile file, Long id) throws EntityNotFoundException, IOException {
         // Проверка существования обьявления
         AdModel adModel = getAdById(id);
         // Сохранения фотографии в бд

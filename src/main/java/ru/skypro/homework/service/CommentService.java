@@ -15,6 +15,8 @@ import ru.skypro.homework.model.entity.UserModel;
 import ru.skypro.homework.repository.CommentRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ public class CommentService {
         UserModel userModel = userService.getUserByUsername(author);
         commentModel.setUser(userModel);
         commentModel.setAds(adModel);
-        commentModel.setCreatedAt(LocalDate.now());
+        commentModel.setCreatedAt(LocalDateTime.now());
 
         // Сохранение сущности
         CommentModel savedCommentModel = repository.save(commentModel);
@@ -74,7 +76,7 @@ public class CommentService {
         CommentModel existingComment = getCommentById(commentId);
         commentModel.setUser(existingComment.getUser());
         commentModel.setAds(existingComment.getAds());
-        commentModel.setCreatedAt(LocalDate.now());
+        commentModel.setCreatedAt(LocalDateTime.now());
 
         // Сохранение обновленной сущности
         CommentModel updatedCommentModel = repository.save(commentModel);
@@ -105,7 +107,7 @@ public class CommentService {
         // Получение списка всех комментариев
         allComments.setCount(repository.countByAds_Id(adId));
         List<CommentModel> commentModels = repository.getAllByAds_Id(adId);
-        if (Objects.isNull(commentModels))
+        if (commentModels.size()==0)
             throw new EntityNotFoundException("Comments don't found");
 
         allComments.setResult(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));

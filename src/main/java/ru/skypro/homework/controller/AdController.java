@@ -179,10 +179,17 @@ public class AdController {
             }
     )
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Ad> createAd(@RequestParam MultipartFile adFile, @RequestBody CreateOrUpdateAd ad, Authentication authentication) throws IOException {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            produces = { MediaType.APPLICATION_JSON_VALUE },
+            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }
+    )
+    public ResponseEntity<Ad> addAd(
+            @RequestPart(value = "properties", required = true) CreateOrUpdateAd properties,
+            @RequestPart(value = "image", required = true) MultipartFile image, Authentication authentication
+    )  throws  IOException{
         try {
-            Ad newAd = adService.create(ad, adFile, authentication.getName());
+            Ad newAd = adService.create(properties, image, authentication.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(newAd);
         } catch (EntityExistsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

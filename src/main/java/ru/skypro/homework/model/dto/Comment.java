@@ -5,13 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
 public class Comment {
     private Long author;
     private String authorImage;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @Id
     private Long pk;
     private String text;

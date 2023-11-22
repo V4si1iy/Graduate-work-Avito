@@ -43,6 +43,7 @@ public interface AdMapper {
         extendedAd.setPhone(adModel.getUser().getPhone());
         extendedAd.setPrice((adModel.getPrice()));
         extendedAd.setTitle(adModel.getTitle());
+        extendedAd.setDescription((adModel.getDescription()));
         return extendedAd;
     }
     default AdModel CreateAdsToAdsModel(AdModel adModel, CreateOrUpdateAd createOrUpdateAd){
