@@ -80,7 +80,7 @@ public class AdService {
         }
     }
 
-    protected AdModel getAdById(Long adId) throws EntityNotFoundException {
+    public AdModel getAdById(Long adId) throws EntityNotFoundException {
         log.info("Fetching Ad with id {}", adId);
 
         try {

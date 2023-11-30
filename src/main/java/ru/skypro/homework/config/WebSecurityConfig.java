@@ -60,8 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
         http.csrf()
                 .disable()
                 .authorizeHttpRequests(
@@ -76,7 +76,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .sessionManagement().disable();
-        return http.build();
     }
 
     @Bean

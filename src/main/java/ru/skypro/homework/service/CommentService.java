@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
 import ru.skypro.homework.mapper.CommentMapper;
-import ru.skypro.homework.model.dto.Comment;
-import ru.skypro.homework.model.dto.Comments;
-import ru.skypro.homework.model.dto.CreateOrUpdateComment;
+import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.entity.UserModel;
@@ -64,39 +62,63 @@ public class CommentService {
         }
     }
 
-    public Comment updateComment(Long commentId, CreateOrUpdateComment updatedComment) throws EntityNotFoundException {
-        log.info("Updating Comment with id {}", commentId);
-
-        // Преобразование DTO в сущность
-        CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
-
-        // Проверка существования объявления
-        CommentModel existingComment = getCommentById(commentId);
-        commentModel.setUser(existingComment.getUser());
-        commentModel.setAds(existingComment.getAds());
-        commentModel.setCreatedAt(LocalDate.now());
-
-        // Сохранение обновленной сущности
-        CommentModel updatedCommentModel = repository.save(commentModel);
-
-        log.info("Comment with id {} updated successfully", commentId);
-        return commentMapper.mapCommentModelToCommentDto(updatedCommentModel);
+//    public Comment updateComment(Long commentId, CreateOrUpdateComment updatedComment) throws EntityNotFoundException {
+//        log.info("Updating Comment with id {}", commentId);
+//
+//        // Преобразование DTO в сущность
+//        CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
+//
+//        // Проверка существования объявления
+//        CommentModel existingComment = getCommentById(commentId);
+//        commentModel.setUser(existingComment.getUser());
+//        commentModel.setAds(existingComment.getAds());
+//        commentModel.setCreatedAt(LocalDate.now());
+//
+//        // Сохранение обновленной сущности
+//        CommentModel updatedCommentModel = repository.save(commentModel);
+//
+//        log.info("Comment with id {} updated successfully", commentId);
+//        return commentMapper.mapCommentModelToCommentDto(updatedCommentModel);
+//    }
+public Comment updateComment(RequestWapperCommentDto rq) throws EntityNotFoundException {
+    Long id = commentMapper.commentModelFromRequestWapperDto(rq).getId();
+    CommentModel commentModel = getCommentById(id);
+    if (null == commentModel) {
+        return null;
     }
-
-    public void deleteComment(Long commentId) throws EntityNotFoundException {
-        log.info("Deleting Comment with id {}", commentId);
-        try {
-            CommentModel existingCommentModel = repository.findById(commentId)
-                    .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
-
-            repository.delete(existingCommentModel);
-
-            log.info("Comment with id {} deleted successfully", commentId);
-        } catch (Exception e) {
-            log.error("Error deleting Comment with id {}", commentId, e);
-            throw e;
-        }
+    if (commentMapper.commentModelFromRequestWapperDto(rq).getText().equals(commentModel.getText())) {
+        return null;
     }
+    commentModel.setText(commentMapper.commentModelFromRequestWapperDto(rq).getText());
+    return commentMapper.mapCommentModelToCommentDto(
+            repository.save(commentModel)
+    );
+}
+
+//    public void deleteComment(Long commentId) throws EntityNotFoundException {
+//        log.info("Deleting Comment with id {}", commentId);
+//        try {
+//            CommentModel existingCommentModel = repository.findById(commentId)
+//                    .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
+//
+//            repository.delete(existingCommentModel);
+//
+//            log.info("Comment with id {} deleted successfully", commentId);
+//        } catch (Exception e) {
+//            log.error("Error deleting Comment with id {}", commentId, e);
+//    throw e;
+//        }
+//    }
+public Comment deleteComment(RequestWapperCommentDto rq) throws EntityNotFoundException {
+    Long id = commentMapper.commentModelFromRequestWapperDto(rq).getId();
+    CommentModel commentModel = getCommentById(id);
+    if (null == commentModel) {
+        return null;
+    }
+    repository.deleteById(id);
+    return commentMapper.mapCommentModelToCommentDto(commentModel);
+}
+
 
     public Comments getAdComments(Long adId) throws EntityNotFoundException {
         log.info("Fetching ad Comments");
@@ -110,5 +132,13 @@ public class CommentService {
 
         allComments.setResult(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));
         return allComments;
+    }
+    public boolean isMine(RequestWapperCommentDto rq) throws EntityNotFoundException {
+        Long id = commentMapper.commentModelFromRequestWapperDto(rq).getId();
+        CommentModel commentModel = getCommentById(id);
+        if (null == commentModel) {
+            return false;
+        }
+        return commentModel.getUser().getUsername().equals(rq.getUsername());
     }
 }

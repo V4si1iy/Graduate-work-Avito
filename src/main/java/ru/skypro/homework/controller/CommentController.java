@@ -5,17 +5,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
-import ru.skypro.homework.model.dto.Comment;
-import ru.skypro.homework.model.dto.Comments;
-import ru.skypro.homework.model.dto.CreateOrUpdateComment;
-import ru.skypro.homework.model.dto.ExtendedAd;
+import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.service.CommentService;
+import ru.skypro.homework.service.UserService;
 
 @RestController
 @RequestMapping("/ads")
@@ -23,6 +23,7 @@ import ru.skypro.homework.service.CommentService;
 @AllArgsConstructor
 public class CommentController {
    private final CommentService commentService;
+    private final UserService userService;
 
 
     @Operation(
@@ -126,16 +127,16 @@ public class CommentController {
             }
     )
     @DeleteMapping("{adId}/comments/{commentId}")
-    public ResponseEntity<Comment> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId){
-        try {
-           commentService.deleteComment((long)commentId);
-            return ResponseEntity.ok().build();
-        }
-        catch (EntityNotFoundException e)
-        {
-            return ResponseEntity.notFound().build();
-
-        }
+    public ResponseEntity<Comment> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId,Authentication authentication) throws EntityNotFoundException {
+        Comment comment = new Comment();
+        comment.setPk((long)(commentId));
+        RequestWapperCommentDto rq = rq()
+                .setAdId(adId)
+                .setData(comment)
+                .setUsername(authentication.getName());
+        comment = commentService.isMine(rq) || userService.getUser(authentication.getName()).getRole() == Role.ADMIN ? commentService.deleteComment(rq) : null;
+        checkResult(comment);
+        return ResponseEntity.ok().build();
     }
     @Operation(
             tags = "Комментарии",
@@ -169,15 +170,29 @@ public class CommentController {
     @PatchMapping("{adId}/comments/{commentId}")
     public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
                                  @PathVariable Integer commentId,
-                                 @RequestBody CreateOrUpdateComment comment){
-        try {
-            Comment newComment = commentService.updateComment((long)commentId,comment);
-            return ResponseEntity.ok(newComment);
-        }
-        catch (EntityNotFoundException e)
-        {
-            return ResponseEntity.notFound().build();
+                                 @RequestBody Comment comment,Authentication authentication) throws EntityNotFoundException {
+        comment.setPk((long)(commentId));
+        RequestWapperCommentDto rq = rq()
+                .setAdId(adId)
+                .setData(comment)
+                .setUsername(authentication.getName());
+        comment = commentService.isMine(rq) || userService.getUser(authentication.getName()).getRole() == Role.ADMIN ? commentService.updateComment(rq) : null;
+        checkResult(comment);
+        return ResponseEntity.ok(comment);
+    }
+    private RequestWapperCommentDto rq() {
+        return new RequestWapperCommentDto();
+    }
 
+    private void checkAuth(Authentication auth) {
+        if (null == auth) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    private void checkResult(Comment comment) {
+        if (null == comment) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
 }

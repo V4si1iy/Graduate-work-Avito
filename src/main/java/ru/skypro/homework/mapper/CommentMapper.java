@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.model.dto.Comment;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
+import ru.skypro.homework.model.dto.RequestWapperCommentDto;
 import ru.skypro.homework.model.entity.CommentModel;
+import ru.skypro.homework.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -13,6 +15,12 @@ import java.util.Optional;
 @Mapper(componentModel = "spring")
 @Component
 public interface CommentMapper {
+    default Long adIdFromRequestWapperDto(RequestWapperCommentDto requestWrapperCommentDto) {
+        return requestWrapperCommentDto.getAdId().longValue();
+    }
+    default CommentModel commentModelFromRequestWapperDto(RequestWapperCommentDto requestWrapperCommentDto) {
+        return mapCommentDtoToCommentModel(requestWrapperCommentDto.getData());
+    }
 
     default Comment mapCommentModelToCommentDto(CommentModel commentModel) {
         Comment comment = new Comment();
