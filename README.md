@@ -59,7 +59,7 @@
 ## Контакты
 
 * Васильев Илья(Лидер) - [@V_IllI_e](https://t.me/V_IllI_e) - pilaroiding@gmail.com - [V4s1l1y](https://github.com/V4si1iy) 
-* Тарасенко Мария - link...
+* Тарасенко Мария - [mariyatarasenko88](https://github.com/mariyatarasenko88)
 
 
 Project Link: [Avito](https://github.com/V4si1iy/Graduate-work-Avito)
