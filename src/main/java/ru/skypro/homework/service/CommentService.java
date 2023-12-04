@@ -74,17 +74,20 @@ public class CommentService {
         // Преобразование DTO в сущность
         CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
 
+        // Проверка существования объявления
+        CommentModel existingComment = getCommentById(commentId);
+        commentModel.setId(existingComment.getId());
+        commentModel.setUser(existingComment.getUser());
+        commentModel.setAds(existingComment.getAds());
+        commentModel.setCreatedAt(LocalDateTime.now());
+
         UserModel userModel= userService.getUserByUsername(user);
         if(userModel.getRole() != Role.ADMIN && !commentModel.getUser().equals(userModel) ) {
             log.error("Error update Comment with id {}", commentId);
             throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
         }
 
-        // Проверка существования объявления
-        CommentModel existingComment = getCommentById(commentId);
-        commentModel.setUser(existingComment.getUser());
-        commentModel.setAds(existingComment.getAds());
-        commentModel.setCreatedAt(LocalDateTime.now());
+
 
         // Сохранение обновленной сущности
         CommentModel updatedCommentModel = repository.save(commentModel);

@@ -26,6 +26,7 @@ public interface UserMapper {
         user.setLastName(userModel.getLastName());
         user.setPhone(userModel.getPhone());
         user.setRole(userModel.getRole());
+        user.setImage(userModel.getImage());
         return user;
     }
    default UserModel mapUserDtoToUserModel(User user, UserModel userModel) {

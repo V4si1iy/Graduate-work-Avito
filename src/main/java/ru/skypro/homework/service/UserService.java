@@ -68,6 +68,8 @@ public class UserService {
                             .username(userDetails.getUsername())
                             .roles(userModel.getRole().toString())
                             .build());
+        userModel.setPassword(encoder.encode(newPassword.getNewPassword()));
+        repository.save(userModel);
     }
 
     public UpdateUser updateUser(UpdateUser user, String username) throws EntityNotFoundException {

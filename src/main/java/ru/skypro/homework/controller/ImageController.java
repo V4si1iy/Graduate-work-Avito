@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import ru.skypro.homework.repository.ImageRepository;
 
 @Controller
 @RequestMapping("/image")
+@CrossOrigin(value = "http://localhost:3000")
 @AllArgsConstructor
 public class ImageController {
     private final ImageRepository imageRepository;
