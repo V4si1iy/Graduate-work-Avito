@@ -17,6 +17,7 @@ import ru.skypro.homework.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -86,14 +87,21 @@ public class UserService {
         return user;
     }
 
-    public void updateUserImage(MultipartFile file , String username) throws EntityNotFoundException, IOException {
+    public void updateUserImage(MultipartFile file, String username) throws EntityNotFoundException, IOException {
         // Проверка существования пользователя
         UserModel userModel = getUserByUsername(username);
         // Сохранения фотографии в бд
         Image image = imageRepository.getImageByLink(userModel.getImage());
+        if (Objects.isNull(image)) {
+            image = new Image();
+            image.setId(UUID.randomUUID().toString());
+        }
         image.setFileSize(file.getSize());
         image.setData(file.getBytes());
         image.setMediaType(file.getContentType());
+        image.setLink("/image/" + image.getId());
+        userModel.setImage("/image/" + image.getId());
+        repository.save(userModel);
         imageRepository.save(image);
 
     }

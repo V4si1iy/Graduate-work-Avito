@@ -6,11 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.NoAccessException;
 import ru.skypro.homework.mapper.AdMapper;
-import ru.skypro.homework.model.dto.Ad;
-import ru.skypro.homework.model.dto.Ads;
-import ru.skypro.homework.model.dto.CreateOrUpdateAd;
-import ru.skypro.homework.model.dto.ExtendedAd;
+import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.entity.Image;
 import ru.skypro.homework.model.entity.UserModel;
@@ -49,8 +47,8 @@ public class AdService {
         image.setFileSize(adFile.getSize());
         image.setData(adFile.getBytes());
         image.setMediaType(adFile.getContentType());
-        adModel.setImage("/image/{" + image.getId() + "}");
-        image.setLink("/image/{" + image.getId() + "}");
+        adModel.setImage("/image/" + image.getId());
+        image.setLink("/image/" + image.getId() );
         imageRepository.save(image);
 
         // Сохранение сущности
@@ -66,16 +64,16 @@ public class AdService {
     }
 
     public ExtendedAd getExtendedAdById(Long adId) throws EntityNotFoundException {
-        log.info("Fetching Ad with id {}", adId);
+        log.info("Fetching ExtendedAd with id {}", adId);
 
         try {
             AdModel adModel = repository.findById(adId)
                     .orElseThrow(() -> new EntityNotFoundException("Ad with id " + adId + " not found"));
 
-            log.info("Fetched Ad: {}", adModel);
+            log.info("Fetched ExtendedAd: {}", adMapper.adsModelToExtendedAdds(adModel));
             return adMapper.adsModelToExtendedAdds(adModel);
         } catch (Exception e) {
-            log.error("Error fetching Ad with id {}", adId, e);
+            log.error("Error fetching ExtendedAd with id {}", adId, e);
             throw e;
         }
     }
@@ -95,11 +93,17 @@ public class AdService {
         }
     }
 
-    public CreateOrUpdateAd updateAd(Long adId, CreateOrUpdateAd updatedAd) throws EntityNotFoundException {
+    public CreateOrUpdateAd updateAd(Long adId, CreateOrUpdateAd updatedAd, String user) throws EntityNotFoundException, NoAccessException {
         log.info("Updating Ad with id {}", adId);
-
         // Проверка существования объявления
         AdModel existingAd = getAdById(adId);
+
+        UserModel userModel= userService.getUserByUsername(user);
+        if(userModel.getRole() != Role.ADMIN && existingAd.getUser() != userModel) {
+            log.error("Error update Ad with id {}", adId);
+            throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
+        }
+
 
         // Преобразование DTO в сущность
         AdModel adModel = adMapper.CreateAdsToAdsModel(updatedAd);
@@ -114,12 +118,15 @@ public class AdService {
         return updatedAd;
     }
 
-    public void deleteAd(Long adId) throws EntityNotFoundException {
+    public void deleteAd(Long adId , String user) throws EntityNotFoundException, NoAccessException {
         log.info("Deleting Ad with id {}", adId);
         try {
             AdModel existingAdModel = repository.findById(adId)
                     .orElseThrow(() -> new EntityNotFoundException("Ad with id " + adId + " not found"));
-
+            UserModel userModel= userService.getUserByUsername(user);
+            if(userModel.getRole() != Role.ADMIN && existingAdModel.getUser() != userModel) {
+                throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
+            }
             repository.delete(existingAdModel);
 
             log.info("Ad with id {} deleted successfully", adId);
@@ -148,9 +155,16 @@ public class AdService {
         return allAd;
     }
 
-    public void updateImageAd(MultipartFile file, Long id) throws EntityNotFoundException, IOException {
+    public void updateImageAd(MultipartFile file, Long id, String user) throws EntityNotFoundException, IOException, NoAccessException {
         // Проверка существования обьявления
         AdModel adModel = getAdById(id);
+
+        UserModel userModel= userService.getUserByUsername(user);
+        if(userModel.getRole() != Role.ADMIN && adModel.getUser() != userModel) {
+            log.error("Error update Ad's image with id {}", id);
+            throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
+        }
+
         // Сохранения фотографии в бд
         Image image = imageRepository.getImageByLink(adModel.getImage());
         image.setFileSize(file.getSize());

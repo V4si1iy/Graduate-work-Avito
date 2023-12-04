@@ -9,5 +9,5 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class Comments {
     private int count;
-    private Collection<Comment> result;
+    private Collection<Comment> results;
 }

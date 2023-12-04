@@ -17,8 +17,9 @@ public interface CommentMapper {
 
     default Comment mapCommentModelToCommentDto(CommentModel commentModel) {
         Comment comment = new Comment();
+        comment.setPk(commentModel.getId());
         comment.setAuthor(commentModel.getUser().getId());
-        comment.setAuthorImage(String.valueOf(Optional.ofNullable(commentModel.getUser())
+        comment.setAuthorImage(String.valueOf(Optional.ofNullable(commentModel.getUser().getImage())
                 .orElse(null)));
         comment.setCreatedAt(LocalDateTime.parse(commentModel.getCreatedAt().toString()));
         comment.setText(commentModel.getText());

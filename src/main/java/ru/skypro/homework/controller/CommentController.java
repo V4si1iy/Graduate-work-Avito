@@ -5,12 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.NoAccessException;
 import ru.skypro.homework.model.dto.Comment;
 import ru.skypro.homework.model.dto.Comments;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
@@ -126,15 +128,17 @@ public class CommentController {
             }
     )
     @DeleteMapping("{adId}/comments/{commentId}")
-    public ResponseEntity<Comment> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId){
+    public ResponseEntity<Comment> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId, Authentication authentication){
         try {
-           commentService.deleteComment((long)commentId);
+           commentService.deleteComment((long)commentId, authentication.getName());
             return ResponseEntity.ok().build();
         }
         catch (EntityNotFoundException e)
         {
             return ResponseEntity.notFound().build();
 
+        } catch (NoAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
     @Operation(
@@ -169,15 +173,17 @@ public class CommentController {
     @PatchMapping("{adId}/comments/{commentId}")
     public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
                                  @PathVariable Integer commentId,
-                                 @RequestBody CreateOrUpdateComment comment){
+                                 @RequestBody CreateOrUpdateComment comment, Authentication authentication){
         try {
-            Comment newComment = commentService.updateComment((long)commentId,comment);
+            Comment newComment = commentService.updateComment((long)commentId,comment, authentication.getName());
             return ResponseEntity.ok(newComment);
         }
         catch (EntityNotFoundException e)
         {
             return ResponseEntity.notFound().build();
 
+        } catch (NoAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 }

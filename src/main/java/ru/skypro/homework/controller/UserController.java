@@ -134,10 +134,10 @@ public class UserController {
                     )
             }
     )
-    @PatchMapping(name ="/me/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity updateUserImage(@RequestParam MultipartFile userFile, Authentication authentication) throws IOException {
+    @PatchMapping(value= "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity updateUserImage(@RequestParam MultipartFile image, Authentication authentication) throws IOException {
         try {
-userService.updateUserImage(userFile,authentication.getName());
+            userService.updateUserImage(image, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

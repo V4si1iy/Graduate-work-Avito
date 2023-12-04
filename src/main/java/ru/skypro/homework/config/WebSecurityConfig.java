@@ -39,11 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/register"
     };
 
+
     @Bean
     public UserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user =
                 User.builder()
-                        .username("user@gmail.com")
+                        .username("user2@gmail.com")
                         .password("password")
                         .passwordEncoder(passwordEncoder::encode)
                         .roles(Role.USER.name())

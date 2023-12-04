@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.NoAccessException;
 import ru.skypro.homework.mapper.AdMapper;
 import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.service.AdService;
@@ -28,7 +29,7 @@ public class AdController {
     AdService adService;
     AdMapper adMapper;
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+
     @Operation(
             tags = "Объявления",
             summary = "Получить все объявления",
@@ -110,12 +111,14 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity removeAd(@PathVariable("id") int id) throws EntityNotFoundException {
+    public ResponseEntity removeAd(@PathVariable("id") int id, Authentication authentication) throws EntityNotFoundException {
         try {
-            adService.deleteAd((long) id);
+            adService.deleteAd((long) id, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (NoAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
@@ -149,13 +152,15 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<CreateOrUpdateAd> updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ad) {
+    public ResponseEntity<CreateOrUpdateAd> updateAd(@PathVariable("id") int id, @RequestBody CreateOrUpdateAd ad , Authentication authentication) {
         try {
-            CreateOrUpdateAd newAd = adService.updateAd((long) id, ad);
+            CreateOrUpdateAd newAd = adService.updateAd((long) id, ad, authentication.getName());
             return ResponseEntity.ok(newAd);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
 
+        } catch (NoAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
@@ -260,15 +265,17 @@ public class AdController {
             }
     )
     @PatchMapping(name = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity updateAdImage(@PathVariable("id") int id, @RequestParam MultipartFile adFile) throws IOException {
+    public ResponseEntity updateAdImage(@PathVariable("id") int id, @RequestParam MultipartFile adFile , Authentication authentication) throws IOException {
         try {
-            adService.updateImageAd(adFile, (long) id);
+            adService.updateImageAd(adFile, (long) id, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         } catch (IOException e) {
             throw e;
+        } catch (NoAccessException e) {
+           return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
     }

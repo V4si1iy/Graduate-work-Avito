@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.EntityExistsException;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.NoAccessException;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.model.dto.Comment;
 import ru.skypro.homework.model.dto.Comments;
 import ru.skypro.homework.model.dto.CreateOrUpdateComment;
+import ru.skypro.homework.model.dto.Role;
 import ru.skypro.homework.model.entity.AdModel;
 import ru.skypro.homework.model.entity.CommentModel;
 import ru.skypro.homework.model.entity.UserModel;
@@ -66,11 +68,17 @@ public class CommentService {
         }
     }
 
-    public Comment updateComment(Long commentId, CreateOrUpdateComment updatedComment) throws EntityNotFoundException {
+    public Comment updateComment(Long commentId, CreateOrUpdateComment updatedComment ,String user) throws EntityNotFoundException, NoAccessException {
         log.info("Updating Comment with id {}", commentId);
 
         // Преобразование DTO в сущность
         CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
+
+        UserModel userModel= userService.getUserByUsername(user);
+        if(userModel.getRole() != Role.ADMIN && commentModel.getUser() != userModel) {
+            log.error("Error update Comment with id {}", commentId);
+            throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
+        }
 
         // Проверка существования объявления
         CommentModel existingComment = getCommentById(commentId);
@@ -85,11 +93,16 @@ public class CommentService {
         return commentMapper.mapCommentModelToCommentDto(updatedCommentModel);
     }
 
-    public void deleteComment(Long commentId) throws EntityNotFoundException {
+    public void deleteComment(Long commentId, String user) throws EntityNotFoundException, NoAccessException {
         log.info("Deleting Comment with id {}", commentId);
         try {
             CommentModel existingCommentModel = repository.findById(commentId)
                     .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
+
+            UserModel userModel= userService.getUserByUsername(user);
+            if(userModel.getRole() != Role.ADMIN && existingCommentModel.getUser() != userModel) {
+                throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
+            }
 
             repository.delete(existingCommentModel);
 
@@ -107,10 +120,10 @@ public class CommentService {
         // Получение списка всех комментариев
         allComments.setCount(repository.countByAds_Id(adId));
         List<CommentModel> commentModels = repository.getAllByAds_Id(adId);
-        if (commentModels.size()==0)
-            throw new EntityNotFoundException("Comments don't found");
+//        if (commentModels.size()==0)
+//            throw new EntityNotFoundException("Comments don't found");
 
-        allComments.setResult(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));
+        allComments.setResults(commentModels.stream().map(commentMapper::mapCommentModelToCommentDto).collect(Collectors.toList()));
         return allComments;
     }
 }
