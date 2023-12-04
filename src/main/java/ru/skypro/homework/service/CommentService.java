@@ -75,7 +75,7 @@ public class CommentService {
         CommentModel commentModel = commentMapper.createOrUpdateCommentToCommentModel(updatedComment);
 
         UserModel userModel= userService.getUserByUsername(user);
-        if(userModel.getRole() != Role.ADMIN && commentModel.getUser() != userModel) {
+        if(userModel.getRole() != Role.ADMIN && !commentModel.getUser().equals(userModel) ) {
             log.error("Error update Comment with id {}", commentId);
             throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
         }
@@ -100,7 +100,7 @@ public class CommentService {
                     .orElseThrow(() -> new EntityNotFoundException("Comment with id " + commentId + " not found"));
 
             UserModel userModel= userService.getUserByUsername(user);
-            if(userModel.getRole() != Role.ADMIN && existingCommentModel.getUser() != userModel) {
+            if(userModel.getRole() != Role.ADMIN && !existingCommentModel.getUser().equals(userModel)) {
                 throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
             }
 

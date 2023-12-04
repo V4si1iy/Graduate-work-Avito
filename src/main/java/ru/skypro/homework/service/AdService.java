@@ -99,7 +99,7 @@ public class AdService {
         AdModel existingAd = getAdById(adId);
 
         UserModel userModel= userService.getUserByUsername(user);
-        if(userModel.getRole() != Role.ADMIN && existingAd.getUser() != userModel) {
+        if(userModel.getRole() != Role.ADMIN && !existingAd.getUser().equals(userModel) ) {
             log.error("Error update Ad with id {}", adId);
             throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
         }
@@ -124,7 +124,7 @@ public class AdService {
             AdModel existingAdModel = repository.findById(adId)
                     .orElseThrow(() -> new EntityNotFoundException("Ad with id " + adId + " not found"));
             UserModel userModel= userService.getUserByUsername(user);
-            if(userModel.getRole() != Role.ADMIN && existingAdModel.getUser() != userModel) {
+            if(userModel.getRole() != Role.ADMIN && !existingAdModel.getUser().equals(userModel)) {
                 throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
             }
             repository.delete(existingAdModel);
@@ -160,7 +160,7 @@ public class AdService {
         AdModel adModel = getAdById(id);
 
         UserModel userModel= userService.getUserByUsername(user);
-        if(userModel.getRole() != Role.ADMIN && adModel.getUser() != userModel) {
+        if(userModel.getRole() != Role.ADMIN && !adModel.getUser().equals(userModel)) {
             log.error("Error update Ad's image with id {}", id);
             throw new NoAccessException("User with username" + userModel.getUsername() + "don't have permission");
         }
