@@ -39,22 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/register"
     };
 
-
-    @Bean
-    public UserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user =
-                User.builder()
-                        .username("user2@gmail.com")
-                        .password("password")
-                        .passwordEncoder(passwordEncoder::encode)
-                        .roles(Role.USER.name())
-                        .build();
-        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
-        userDetailsManager.updateUser(user);
-        return userDetailsManager;
-    }
-
-
+    
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
