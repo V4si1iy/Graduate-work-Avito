@@ -16,7 +16,7 @@
   <p align="center">
     Командная работа для обработки запросов с фронтенда
     <br />
-    <a href="https://skyengpublic.notion.site/47bcac1b049f4af6b351e2ab5d05afb4"><strong>ТЗ проекта »</strong></a>
+    <a href="https://github.com/BizinMitya/front-react-avito"><strong>Фронтенд проект»</strong></a>
   </p>
 </div>
 
@@ -35,23 +35,23 @@
 В данном блоке представленны технологии разработки использованные в проекте.
 
 *  <a href="https://spring.io/">
-    <img src="src/images/spring.png" alt="shield" width="200" height="80">
+    <img src="src/images/spring.png" alt="shield" width="150" height="50">
   </a>
 
 *  <a href="https://mapstruct.org/">
-    <img src="src/images/mapstruct.png" alt="shield" width="200" height="80">
+    <img src="src/images/mapstruct.png" alt="shield" width="150" height="50">
   </a>
 
 *  <a href="https://projectlombok.org/">
-    <img src="src/images/lombok-logo.png" alt="shield" width="200" height="80">
+    <img src="src/images/lombok-logo.png" alt="shield" width="70" height="70">
   </a>
 
 *  <a href="https://github.com/OAI/OpenAPI-Specification">
-    <img src="src/images/openapi.png" alt="shield" width="200" height="80">
+    <img src="src/images/openapi.png" alt="shield" width="70" height="70">
   </a>
 
 *  <a href="https://swagger.io/">
-    <img src="src/images/swagger-logo-2.webp" alt="shield" width="200" height="80">
+    <img src="src/images/swagger-logo-2.webp" alt="shield" width="70" height="70">
   </a>
 
 
