@@ -1,5 +1,6 @@
 package ru.skypro.homework.mapper;
 
+import lombok.AllArgsConstructor;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,11 @@ import java.util.Optional;
 @Component
 public interface CommentMapper {
 
+
     default Comment mapCommentModelToCommentDto(CommentModel commentModel) {
         Comment comment = new Comment();
         comment.setPk(commentModel.getId());
-        comment.setAuthor(commentModel.getUser().getId());
+        comment.setAuthor(commentModel.getUser().getUsername());
         comment.setAuthorImage(String.valueOf(Optional.ofNullable(commentModel.getUser().getImage())
                 .orElse(null)));
         comment.setCreatedAt(LocalDateTime.parse(commentModel.getCreatedAt().toString()));

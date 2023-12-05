@@ -13,7 +13,6 @@ public class Image {
 
     @Id
     private String id;
-
     private String link;
     private long fileSize;
     private String mediaType;

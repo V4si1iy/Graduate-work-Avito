@@ -2,12 +2,16 @@ package ru.skypro.homework.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.InvalidLoginPasswordException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.dto.*;
 import ru.skypro.homework.model.entity.Image;
@@ -26,16 +30,10 @@ public class UserService {
     private final UserRepository repository;
 
     private final UserMapper userMapper;
-    private final UserDetailsManager manager;
+    private final CustomUserDetailsService manager;
     private final PasswordEncoder encoder;
     private final ImageRepository imageRepository;
 
-    public void create(Register register, Role role) {
-        UserModel userModel = userMapper.mapRegisterToUserModel(register, new UserModel());
-        userModel.setPassword(encoder.encode(register.getPassword()));
-        userModel.setRole(Objects.requireNonNullElse(role, Role.USER));
-        repository.save(userModel);
-    }
 
     public User getUserByUsernameDto(String username) throws EntityNotFoundException {
         return userMapper.mapToUserDto(getUserByUsername(username));
@@ -57,18 +55,15 @@ public class UserService {
         }
     }
 
-    public void setNewPassword(NewPasswordDTO newPassword, String user) throws EntityNotFoundException {
-        UserModel userModel = getUserByUsername(user);
+    public void setNewPassword(NewPasswordDTO newPassword, String user) throws EntityNotFoundException, InvalidLoginPasswordException {
         UserDetails userDetails = manager.loadUserByUsername(user);
-        if (encoder.matches(newPassword.getCurrentPassword(), userDetails.getPassword()))
-            manager.updateUser(
-                    org.springframework.security.core.userdetails.User.builder()
-                            .passwordEncoder(this.encoder::encode)
-                            .password(newPassword.getNewPassword())
-                            .username(userDetails.getUsername())
-                            .roles(userModel.getRole().toString())
-                            .build());
-        userModel.setPassword(encoder.encode(newPassword.getNewPassword()));
+
+        if (!repository.findByUsername(user).isPresent() || !encoder.matches(newPassword.getCurrentPassword(), userDetails.getPassword())) {
+            throw new InvalidLoginPasswordException("Incorrect User");
+        }
+        UserModel userModel = getUserByUsername(user);
+        String encode = encoder.encode(newPassword.getNewPassword());
+        userModel.setPassword(encode);
         repository.save(userModel);
     }
 

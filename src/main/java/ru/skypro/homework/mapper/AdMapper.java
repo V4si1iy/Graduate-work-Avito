@@ -17,7 +17,7 @@ import static java.util.Objects.isNull;
 public interface AdMapper {
     default Ad adModelToAdDto(AdModel adModel){
         Ad ad = new Ad();
-        ad.setAuthor(adModel.getUser().getId());
+        ad.setAuthor(adModel.getUser().getUsername());
         ad.setImage(Optional.ofNullable(adModel.getImage())
                 .orElse(null));
         ad.setPk(adModel.getId());

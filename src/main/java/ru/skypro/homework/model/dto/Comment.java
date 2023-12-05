@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @RequiredArgsConstructor
 public class Comment {
-    private Long author;
+    private String author;
     private String authorImage;
     private LocalDateTime createdAt;
     @Id

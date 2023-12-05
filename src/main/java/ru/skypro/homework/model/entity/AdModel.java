@@ -19,6 +19,6 @@ public class AdModel {
 
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_username")
     private UserModel user;
 }

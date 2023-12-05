@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.exception.EntityNotFoundException;
+import ru.skypro.homework.exception.InvalidLoginPasswordException;
 import ru.skypro.homework.model.dto.ExtendedAd;
 import ru.skypro.homework.model.dto.NewPasswordDTO;
 import ru.skypro.homework.model.dto.UpdateUser;
@@ -86,6 +87,8 @@ public class UserController {
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (InvalidLoginPasswordException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 

@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserModel,Long> {
 
 
-  public UserModel getUserModelByUsername(String username);
-  UserModel findByUsername(String login);
+ UserModel getUserModelByUsername(String username);
+Optional<UserModel> findByUsername(String login);
 }

@@ -15,7 +15,7 @@ public class CommentModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_username")
     private UserModel user;
     @ManyToOne
     @JoinColumn(name = "ads_id")

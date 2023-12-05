@@ -20,7 +20,6 @@ import java.lang.annotation.Target;
 public interface UserMapper {
     default User mapToUserDto(UserModel userModel) {
     User user = new User();
-        user.setId(userModel.getId());
         user.setEmail(userModel.getUsername());
         user.setFirstName(userModel.getFirstName());
         user.setLastName(userModel.getLastName());
@@ -30,7 +29,6 @@ public interface UserMapper {
         return user;
     }
    default UserModel mapUserDtoToUserModel(User user, UserModel userModel) {
-        userModel.setId(user.getId());
         userModel.setUsername(user.getEmail());
         userModel.setFirstName(user.getFirstName());
         userModel.setLastName(user.getLastName());
@@ -40,11 +38,9 @@ public interface UserMapper {
     }
    default UserModel mapRegisterToUserModel(Register register, UserModel userModel) {
         userModel.setUsername(register.getUsername());
-        userModel.setPassword(register.getPassword());
         userModel.setFirstName(register.getFirstName());
         userModel.setLastName(register.getLastName());
         userModel.setPhone(register.getPhone());
-        userModel.setRole(register.getRole());
         return userModel;
     }
 }

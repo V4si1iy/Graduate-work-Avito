@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @RequiredArgsConstructor
 public class Ad {
-    private Long author;
+    private String author;
     private String image;
     @Id
     private Long pk;
