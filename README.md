@@ -25,11 +25,10 @@
 
 <!-- ABOUT THE PROJECT -->
 ## О проекте
-Данный проект был создан разработчиками:
-* Тарасенко Мария
+Данный проект был создан разработчиком:
 * Васильев Илья
 
-В данном проекте мы использовали все полученные знания для создание бэк сервиса продажи вещей. В ходе выполнения так же был изучены новые технологии, такие как Spring Security и MapStruct.
+В данном проекте использовал все полученные знания для создание бэк сервиса продажи вещей. В ходе выполнения так же был изучены новые технологии, такие как Spring Security и MapStruct.
 ### Сделан на
 
 В данном блоке представленны технологии разработки использованные в проекте.
@@ -58,9 +57,7 @@
 <!-- CONTACT -->
 ## Контакты
 
-* Васильев Илья(Лидер) - [@V_IllI_e](https://t.me/V_IllI_e) - pilaroiding@gmail.com - [V4s1l1y](https://github.com/V4si1iy) 
-* Тарасенко Мария - [mariyatarasenko88](https://github.com/mariyatarasenko88)
-
+* Васильев Илья - [@V_IllI_e](https://t.me/V_IllI_e) - pilaroiding@gmail.com - [V4s1l1y](https://github.com/V4si1iy) 
 
 Project Link: [Avito](https://github.com/V4si1iy/Graduate-work-Avito)
 
