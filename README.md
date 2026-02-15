@@ -7,16 +7,16 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://my.sky.pro/">
+  <a>
     <img src="src/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Серверная часть для платформы по перепродаже вещей  </h3>
 
   <p align="center">
-    Командная работа для обработки запросов с фронтенда
+    Работа для обработки запросов с фронтенда
     <br />
-    <a href="https://github.com/BizinMitya/front-react-avito"><strong>Фронтенд проект»</strong></a>
+
   </p>
 </div>
 
